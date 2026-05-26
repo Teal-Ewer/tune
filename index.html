@@ -8,7 +8,7 @@
 			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>"
 		/>
 
-		<title>Brass Tuning Calculator — Drum Corps</title>
+		<title>Brass Tuning Calculator - Drum Corps</title>
 		<script>
 			(function () {
 				let theme;
@@ -227,7 +227,7 @@
 				column-gap: 10px;
 				row-gap: 8px;
 				align-items: center;
-				margin-bottom: 10px;
+				margin-bottom: 20px;
 			}
 			.input-row label {
 				font-size: 13px;
@@ -252,6 +252,7 @@
 			@media (min-width: 720px) {
 				.input-row {
 					grid-template-columns: 70px 1fr 60px 28px;
+					margin-bottom: 10px;
 				}
 				.input-row label,
 				.input-row input[type="range"],
@@ -426,7 +427,7 @@
 				column-gap: 12px;
 				row-gap: 8px;
 				align-items: center;
-				margin-bottom: 10px;
+				margin-bottom: 20px;
 			}
 			.buffer-row label {
 				font-size: 13px;
@@ -444,6 +445,7 @@
 			@media (min-width: 720px) {
 				.buffer-row {
 					grid-template-columns: 130px 1fr 60px;
+					margin-bottom: 10px;
 				}
 				.buffer-row label,
 				.buffer-row input[type="range"],
@@ -556,9 +558,31 @@
 				padding: 12px 16px;
 				border-radius: var(--radius-sm);
 				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-				font-size: 13px;
+				font-size: 16px;
 				margin: 12px 0;
 				overflow-x: auto;
+			}
+
+			.symbol-list {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				column-gap: 16px;
+				row-gap: 8px;
+				margin: 12px 0 20px;
+				padding: 14px 16px;
+				background: var(--surface-2);
+				border-radius: var(--radius-sm);
+				font-size: 14px;
+			}
+			.symbol-list dt {
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				color: var(--text);
+				font-weight: 500;
+				white-space: nowrap;
+			}
+			.symbol-list dd {
+				margin: 0;
+				color: var(--muted);
 			}
 
 			footer {
@@ -663,7 +687,9 @@
 							<div class="condition-group">
 								<h3>Tuning room (indoor)</h3>
 								<div class="input-row">
-									<label id="indoor-temp-label" for="indoor-temp-input">Temp</label>
+									<label id="indoor-temp-label" for="indoor-temp-input"
+										>Temp</label
+									>
 									<input
 										type="range"
 										x-model.number="indoorT"
@@ -682,10 +708,16 @@
 										step="1"
 										aria-describedby="indoor-temp-unit"
 									/>
-									<span id="indoor-temp-unit" class="unit-label" x-text="'°' + units"></span>
+									<span
+										id="indoor-temp-unit"
+										class="unit-label"
+										x-text="'°' + units"
+									></span>
 								</div>
 								<div class="input-row">
-									<label id="indoor-humidity-label" for="indoor-humidity-input">Humidity</label>
+									<label id="indoor-humidity-label" for="indoor-humidity-input"
+										>Humidity</label
+									>
 									<input
 										type="range"
 										x-model.number="indoorRH"
@@ -711,7 +743,9 @@
 							<div class="condition-group">
 								<h3>Performance field (outdoor)</h3>
 								<div class="input-row">
-									<label id="outdoor-temp-label" for="outdoor-temp-input">Temp</label>
+									<label id="outdoor-temp-label" for="outdoor-temp-input"
+										>Temp</label
+									>
 									<input
 										type="range"
 										x-model.number="outdoorT"
@@ -730,10 +764,18 @@
 										step="1"
 										aria-describedby="outdoor-temp-unit"
 									/>
-									<span id="outdoor-temp-unit" class="unit-label" x-text="'°' + units"></span>
+									<span
+										id="outdoor-temp-unit"
+										class="unit-label"
+										x-text="'°' + units"
+									></span>
 								</div>
 								<div class="input-row">
-									<label id="outdoor-humidity-label" for="outdoor-humidity-input">Humidity</label>
+									<label
+										id="outdoor-humidity-label"
+										for="outdoor-humidity-input"
+										>Humidity</label
+									>
 									<input
 										type="range"
 										x-model.number="outdoorRH"
@@ -874,7 +916,7 @@
 							<p>
 								A few minutes of normal playing to stabilize every horn at the
 								tuning area's conditions. A rough ensemble tune and
-								intra-section spot-checking are fine here — players align to
+								intra-section spot-checking are fine here - players align to
 								each other loosely so the final tune is a small adjustment, not
 								a reset.
 							</p>
@@ -887,7 +929,7 @@
 							<h3>Final tune to section targets</h3>
 							<p>
 								Each section to its computed Hz. The cross-section frequencies
-								are intentionally different — communicate this explicitly so
+								are intentionally different - communicate this explicitly so
 								nobody "corrects" it later.
 							</p>
 						</div>
@@ -966,7 +1008,7 @@
 							>
 							<span
 								>Without on-field prep, low brass will be drifting throughout
-								the early portion of the show — trumpets reach field equilibrium
+								the early portion of the show - trumpets reach field equilibrium
 								in 2–3 minutes, tubas in 8–10. Pre-staging horns in shade at
 								performance-area conditions before warm-up reduces this; the
 								metal body pre-equilibrates while the air column adjusts during
@@ -986,7 +1028,7 @@
 							<span
 								>A 12-minute show gives tubas time to fully equilibrate; a
 								4-minute exhibition doesn't. For shorter performances, low
-								brass's effective buffer is lower than steady-state — dial
+								brass's effective buffer is lower than steady-state - dial
 								tuba/contra buffers down accordingly.</span
 							>
 						</li>
@@ -995,67 +1037,97 @@
 					<h2>The physics, step by step</h2>
 					<p>
 						The pitch a brass instrument produces is set by standing waves in
-						its air column. For a tube of fixed length, every resonant
-						frequency scales directly with the speed of sound in the air
-						inside it:
+						its air column. For a tube of fixed length, every resonant frequency
+						scales directly with the speed of sound in the air inside it -
+						written <strong>c</strong> in acoustics (the standard symbol; a
+						separate convention from the c used for the speed of light in
+						physics):
 					</p>
 					<div class="formula">f ∝ c</div>
+					<p>The walkthrough below uses these symbols:</p>
+					<dl class="symbol-list">
+						<dt>f</dt>
+						<dd>frequency the horn produces (the pitch)</dd>
+						<dt>c</dt>
+						<dd>speed of sound in the air (m/s)</dd>
+						<dt>T</dt>
+						<dd>temperature (°C)</dd>
+						<dt>RH</dt>
+						<dd>relative humidity (%)</dd>
+						<dt>β</dt>
+						<dd>
+							buffer factor - fraction of the air column that tracks ambient
+							temperature; (1 − β) is the fraction held near breath temperature
+						</dd>
+						<dt>c_breath</dt>
+						<dd>speed of sound at breath temperature (~35°C, saturated)</dd>
+						<dt>c_ambient</dt>
+						<dd>speed of sound at the surrounding air (indoor or outdoor)</dd>
+						<dt>c_eff</dt>
+						<dd>
+							effective speed of sound in the column - the breath/ambient blend
+						</dd>
+						<dt>c_in_eff</dt>
+						<dd>c_eff in the tuning room (c_ambient = c_indoor)</dd>
+						<dt>c_out_eff</dt>
+						<dd>c_eff on the field (c_ambient = c_outdoor)</dd>
+						<dt>shift</dt>
+						<dd>c_out_eff / c_in_eff - the ratio your pitch will drift by</dd>
+						<dt>targetHz</dt>
+						<dd>the frequency you want the section to land on outdoors</dd>
+						<dt>tuneTo</dt>
+						<dd>the indoor target each section actually tunes to</dd>
+					</dl>
 					<p>
-						Speed of sound depends mostly on temperature, slightly on
-						humidity:
+						Speed of sound depends mostly on temperature, slightly on humidity:
 					</p>
 					<div class="formula">
-						c(T, RH) ≈ 331.3 + 0.606·T + 0.0124·RH&nbsp;&nbsp;&nbsp;(m/s, T in °C, RH in %)
+						c(T, RH) ≈ 331.3 + 0.606·T + 0.0124·RH&nbsp;&nbsp;&nbsp;(m/s, T in
+						°C, RH in %)
 					</div>
 					<p>
-						A 10°C warming raises c by about 1.8%. Because f scales with c,
-						that same horn now plays 1.8% sharp — roughly 30 cents. Easily
-						audible, and the entire problem this calculator pre-compensates
-						for.
+						A 10°C warming raises c by about 1.8%. Because f scales with c, that
+						same horn now plays 1.8% sharp - roughly 30 cents. Easily audible,
+						and the entire problem this calculator pre-compensates for.
 					</p>
 					<p>
-						But the air inside a horn is not all at ambient temperature.
-						Warm breath fills the leadpipe and the first stretch of tubing,
-						holding it near body temperature (~35°C). The far reaches drift
-						toward ambient as cold metal pulls heat out of the air. So the
-						effective speed of sound is a weighted blend of two parts of the
-						column:
+						But the air inside a horn is not all at ambient temperature. Warm
+						breath fills the leadpipe and the first stretch of tubing, holding
+						it near body temperature (~35°C). The far reaches drift toward
+						ambient as cold metal pulls heat out of the air. So the effective
+						speed of sound is a weighted blend of two parts of the column:
 					</p>
-					<div class="formula">
-						c_eff = (1 − β)·c_breath + β·c_ambient
-					</div>
+					<div class="formula">c_eff = (1 − β)·c_breath + β·c_ambient</div>
 					<p>
-						β is the fraction of the column that tracks ambient; (1 − β) is
-						the fraction held at breath temperature. Bigger horns have higher
-						β — more tubing far from the leadpipe, and more cold metal mass
-						pulling things toward ambient regardless of breath input.
+						β is the fraction of the column that tracks ambient; (1 − β) is the
+						fraction held at breath temperature. Bigger horns have higher β -
+						more tubing far from the leadpipe, and more cold metal mass pulling
+						things toward ambient regardless of breath input.
 					</p>
 					<p>
-						Apply this once for the tuning room (c_ambient = c_indoor) and
-						once for the field (c_ambient = c_outdoor). The ratio tells you
-						exactly how much the horn's pitch will shift between the two:
+						Apply this once for the tuning room (c_ambient = c_indoor) and once
+						for the field (c_ambient = c_outdoor). The ratio tells you exactly
+						how much the horn's pitch will shift between the two:
 					</p>
-					<div class="formula">
-						shift = c_out_eff / c_in_eff
-					</div>
+					<div class="formula">shift = c_out_eff / c_in_eff</div>
 					<p>
 						To land on the target frequency outdoors, tune indoors to a
-						deliberately offset frequency that will rise by exactly this
-						factor as the horn equilibrates:
+						deliberately offset frequency that will rise by exactly this factor
+						as the horn equilibrates:
 					</p>
 					<div class="formula">tuneTo = targetHz / shift</div>
 					<p>
-						Each section gets its own tuneTo because each section has its own
-						β. Trumpets (short tubing, breath dominates the column) get a
-						target close to the bare targetHz. Tubas (long tubing, lots of
-						cold metal) get a target noticeably below it: they'll drift
-						further sharp once the air column equilibrates outdoors, so they
-						start lower indoors and land on pitch on the field.
+						Each section gets its own tuneTo because each section has its own β.
+						Trumpets (short tubing, breath dominates the column) get a target
+						close to the bare targetHz. Tubas (long tubing, lots of cold metal)
+						get a target noticeably below it: they'll drift further sharp once
+						the air column equilibrates outdoors, so they start lower indoors
+						and land on pitch on the field.
 					</p>
 
 					<h2>What is the buffer factor?</h2>
 					<p>
-						"Buffer factor" isn't a standard acoustics term — it's a coefficient
+						"Buffer factor" isn't a standard acoustics term - it's a coefficient
 						I'm using to capture a real physical effect concisely. When you
 						play, only part of the horn's air column tracks ambient temperature;
 						the rest sits near breath temperature because your continuous warm
@@ -1066,7 +1138,7 @@
 						β = 0 would mean the column is entirely at breath temperature
 						(ambient has no effect on pitch). β = 1 would mean the column
 						entirely tracks ambient (no breath warming at all). Real horns sit
-						between roughly 0.65 and 0.95, scaling with instrument size — larger
+						between roughly 0.65 and 0.95, scaling with instrument size - larger
 						horns have more cold metal mass and longer tubing, so a greater
 						fraction of the column equilibrates to ambient regardless of breath
 						input.
@@ -1094,7 +1166,7 @@
 						</li>
 						<li style="margin-bottom: 8px">
 							From recordings or live observation, note how each section sat
-							against the pit in exposed sustained moments — especially early
+							against the pit in exposed sustained moments - especially early
 							vs. late in the show.
 						</li>
 						<li style="margin-bottom: 8px">
@@ -1196,7 +1268,8 @@
 
 					sectionResult(buffer) {
 						const cInEff = (1 - buffer) * this.cBreath + buffer * this.cIndoor;
-						const cOutEff = (1 - buffer) * this.cBreath + buffer * this.cOutdoor;
+						const cOutEff =
+							(1 - buffer) * this.cBreath + buffer * this.cOutdoor;
 						const adjRatio = cOutEff / cInEff;
 						const tuneTo = this.targetHz / adjRatio;
 						const cents = 1200 * Math.log2(tuneTo / this.targetHz);
@@ -1244,9 +1317,10 @@
 					},
 
 					loadState() {
-						this.theme = document.documentElement.dataset.theme === "dark"
-							? "dark"
-							: "light";
+						this.theme =
+							document.documentElement.dataset.theme === "dark"
+								? "dark"
+								: "light";
 						try {
 							const raw = localStorage.getItem("brass-tuner-v1");
 							if (!raw) return;
