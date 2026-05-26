@@ -89,17 +89,15 @@
 			header {
 				margin-bottom: 28px;
 			}
-			.header-top {
+			.theme-row {
 				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				gap: 12px;
-				margin-bottom: 4px;
+				justify-content: flex-end;
+				margin-bottom: 12px;
 			}
 			h1 {
 				font-size: 24px;
 				font-weight: 600;
-				margin: 0;
+				margin: 0 0 4px;
 			}
 			.subtitle {
 				color: var(--muted);
@@ -545,8 +543,7 @@
 	<body>
 		<div class="container" x-data="app()" x-cloak x-init="init()">
 			<header>
-				<div class="header-top">
-					<h1>Brass tuning calculator</h1>
+				<div class="theme-row">
 					<div class="theme-toggle" role="group" aria-label="Theme">
 						<button
 							@click="theme = 'light'"
@@ -592,6 +589,7 @@
 						</button>
 					</div>
 				</div>
+				<h1>Brass tuning calculator</h1>
 				<p class="subtitle">
 					Section-specific tuning targets for drum corps, compensating for
 					temperature and humidity between indoor tuning and outdoor
@@ -635,7 +633,7 @@
 										type="range"
 										x-model.number="indoorT"
 										:min="tempMin"
-										:max="tempMaxIndoor"
+										:max="tempMax"
 										aria-labelledby="indoor-temp-label"
 										aria-describedby="indoor-temp-unit"
 									/>
@@ -644,7 +642,7 @@
 										id="indoor-temp-input"
 										x-model.number="indoorT"
 										:min="tempMin"
-										:max="tempMaxIndoor"
+										:max="tempMax"
 										inputmode="numeric"
 										step="1"
 										aria-describedby="indoor-temp-unit"
@@ -683,7 +681,7 @@
 										type="range"
 										x-model.number="outdoorT"
 										:min="tempMin"
-										:max="tempMaxOutdoor"
+										:max="tempMax"
 										aria-labelledby="outdoor-temp-label"
 										aria-describedby="outdoor-temp-unit"
 									/>
@@ -692,7 +690,7 @@
 										id="outdoor-temp-input"
 										x-model.number="outdoorT"
 										:min="tempMin"
-										:max="tempMaxOutdoor"
+										:max="tempMax"
 										inputmode="numeric"
 										step="1"
 										aria-describedby="outdoor-temp-unit"
@@ -959,23 +957,65 @@
 						</li>
 					</ul>
 
-					<h2>The physics in one paragraph</h2>
+					<h2>The physics, step by step</h2>
 					<p>
-						Brass pitch is set by the speed of sound in the horn's air column.
-						Speed of sound depends mostly on temperature, a little on humidity:
+						The pitch a brass instrument produces is set by standing waves in
+						its air column. For a tube of fixed length, every resonant
+						frequency scales directly with the speed of sound in the air
+						inside it:
+					</p>
+					<div class="formula">f ∝ c</div>
+					<p>
+						Speed of sound depends mostly on temperature, slightly on
+						humidity:
 					</p>
 					<div class="formula">
-						c(T, RH) ≈ 331.3 + 0.606·T + 0.0124·RH (T in °C, RH in %)
+						c(T, RH) ≈ 331.3 + 0.606·T + 0.0124·RH&nbsp;&nbsp;&nbsp;(m/s, T in °C, RH in %)
 					</div>
 					<p>
-						Tune at one c, play at another, and the horn shifts by the ratio.
-						But only part of the column is at ambient — your breath holds the
-						rest near body temperature. The buffer factor is that fractional
-						weight. Trumpets (short tubing, breath dominates) have low β; tubas
-						(long tubing, more cold metal mass) have high β. The same
-						indoor-to-outdoor temperature change therefore shifts a tuba further
-						than a trumpet, which is why an ensemble tuned to one Hz indoors
-						comes apart on the field.
+						A 10°C warming raises c by about 1.8%. Because f scales with c,
+						that same horn now plays 1.8% sharp — roughly 30 cents. Easily
+						audible, and the entire problem this calculator pre-compensates
+						for.
+					</p>
+					<p>
+						But the air inside a horn is not all at ambient temperature.
+						Warm breath fills the leadpipe and the first stretch of tubing,
+						holding it near body temperature (~35°C). The far reaches drift
+						toward ambient as cold metal pulls heat out of the air. So the
+						effective speed of sound is a weighted blend of two parts of the
+						column:
+					</p>
+					<div class="formula">
+						c_eff = (1 − β)·c_breath + β·c_ambient
+					</div>
+					<p>
+						β is the fraction of the column that tracks ambient; (1 − β) is
+						the fraction held at breath temperature. Bigger horns have higher
+						β — more tubing far from the leadpipe, and more cold metal mass
+						pulling things toward ambient regardless of breath input.
+					</p>
+					<p>
+						Apply this once for the tuning room (c_ambient = c_indoor) and
+						once for the field (c_ambient = c_outdoor). The ratio tells you
+						exactly how much the horn's pitch will shift between the two:
+					</p>
+					<div class="formula">
+						shift = c_out_eff / c_in_eff
+					</div>
+					<p>
+						To land on the target frequency outdoors, tune indoors to a
+						deliberately offset frequency that will rise by exactly this
+						factor as the horn equilibrates:
+					</p>
+					<div class="formula">tuneTo = targetHz / shift</div>
+					<p>
+						Each section gets its own tuneTo because each section has its own
+						β. Trumpets (short tubing, breath dominates the column) get a
+						target close to the bare targetHz. Tubas (long tubing, lots of
+						cold metal) get a target noticeably below it: they'll drift
+						further sharp once the air column equilibrates outdoors, so they
+						start lower indoors and land on pitch on the field.
 					</p>
 
 					<h2>What is the buffer factor?</h2>
@@ -1066,12 +1106,9 @@
 					},
 
 					get tempMin() {
-						return this.units === "F" ? 40 : 5;
+						return this.units === "F" ? -10 : -23;
 					},
-					get tempMaxIndoor() {
-						return this.units === "F" ? 90 : 32;
-					},
-					get tempMaxOutdoor() {
+					get tempMax() {
 						return this.units === "F" ? 110 : 43;
 					},
 
@@ -1104,6 +1141,10 @@
 						return 331.3 + 0.606 * tC + 0.0124 * rh;
 					},
 
+					get cBreath() {
+						return this.speedOfSound(35, 100);
+					},
+
 					get cIndoor() {
 						return this.speedOfSound(
 							this.toCelsius(this.indoorT),
@@ -1118,12 +1159,10 @@
 						);
 					},
 
-					get fullRatio() {
-						return this.cOutdoor / this.cIndoor;
-					},
-
 					sectionResult(buffer) {
-						const adjRatio = 1 + buffer * (this.fullRatio - 1);
+						const cInEff = (1 - buffer) * this.cBreath + buffer * this.cIndoor;
+						const cOutEff = (1 - buffer) * this.cBreath + buffer * this.cOutdoor;
+						const adjRatio = cOutEff / cInEff;
 						const tuneTo = this.targetHz / adjRatio;
 						const cents = 1200 * Math.log2(tuneTo / this.targetHz);
 						return { tuneTo, cents };
