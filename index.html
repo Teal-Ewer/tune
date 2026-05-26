@@ -224,24 +224,40 @@
 			.input-row {
 				display: grid;
 				grid-template-columns: 1fr 60px 28px;
-				gap: 10px;
+				column-gap: 10px;
+				row-gap: 8px;
 				align-items: center;
 				margin-bottom: 10px;
 			}
 			.input-row label {
 				font-size: 13px;
 				color: var(--muted);
-				grid-column: 1 / -1;
+				grid-row: 1;
+				grid-column: 1;
+			}
+			.input-row input[type="number"] {
+				grid-row: 1;
+				grid-column: 2;
 			}
 			.input-row .unit-label {
 				font-size: 13px;
 				color: var(--muted);
+				grid-row: 1;
+				grid-column: 3;
+			}
+			.input-row input[type="range"] {
+				grid-row: 2;
+				grid-column: 1 / -1;
 			}
 			@media (min-width: 720px) {
 				.input-row {
 					grid-template-columns: 70px 1fr 60px 28px;
 				}
-				.input-row label {
+				.input-row label,
+				.input-row input[type="range"],
+				.input-row input[type="number"],
+				.input-row .unit-label {
+					grid-row: auto;
 					grid-column: auto;
 				}
 			}
@@ -249,7 +265,7 @@
 			input[type="number"] {
 				width: 100%;
 				padding: 6px 8px;
-				font-size: 14px;
+				font-size: 16px;
 				font-family: inherit;
 				border: 1px solid var(--border-strong);
 				border-radius: var(--radius-sm);
@@ -407,19 +423,32 @@
 			.buffer-row {
 				display: grid;
 				grid-template-columns: 1fr 60px;
-				gap: 12px;
+				column-gap: 12px;
+				row-gap: 8px;
 				align-items: center;
 				margin-bottom: 10px;
 			}
 			.buffer-row label {
 				font-size: 13px;
+				grid-row: 1;
+				grid-column: 1;
+			}
+			.buffer-row input[type="number"] {
+				grid-row: 1;
+				grid-column: 2;
+			}
+			.buffer-row input[type="range"] {
+				grid-row: 2;
 				grid-column: 1 / -1;
 			}
 			@media (min-width: 720px) {
 				.buffer-row {
 					grid-template-columns: 130px 1fr 60px;
 				}
-				.buffer-row label {
+				.buffer-row label,
+				.buffer-row input[type="range"],
+				.buffer-row input[type="number"] {
+					grid-row: auto;
 					grid-column: auto;
 				}
 			}
@@ -541,7 +570,13 @@
 		</style>
 	</head>
 	<body>
-		<div class="container" x-data="app()" x-cloak x-init="init()">
+		<div
+			class="container"
+			x-data="app()"
+			x-cloak
+			x-init="init()"
+			@focusin="if ($event.target.type === 'number') $event.target.select()"
+		>
 			<header>
 				<div class="theme-row">
 					<div class="theme-toggle" role="group" aria-label="Theme">
