@@ -321,15 +321,37 @@
 
 			.target-row {
 				display: grid;
-				grid-template-columns: 1fr 100px 28px;
+				grid-template-columns: 1fr 180px;
 				gap: 10px;
 				align-items: center;
 				padding-top: 16px;
 				border-top: 1px solid var(--border);
 			}
+			.target-row.pit-row {
+				border-top: none;
+				padding-top: 12px;
+			}
 			.target-row label {
 				font-size: 14px;
 				font-weight: 500;
+			}
+
+			.pit-select {
+				width: 100%;
+				min-width: 100px;
+				padding: 6px 8px;
+				font-size: 14px;
+				font-family: inherit;
+				border: 1px solid var(--border-strong);
+				border-radius: var(--radius-sm);
+				background: var(--surface);
+				color: var(--text);
+				cursor: pointer;
+			}
+			.pit-select:focus {
+				outline: 2px solid var(--accent);
+				outline-offset: -1px;
+				border-color: var(--accent);
 			}
 
 			.section-heading {
@@ -388,8 +410,28 @@
 				color: var(--muted);
 			}
 
+			.electronics-readout {
+				margin-top: 16px;
+				padding: 14px 20px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				font-size: 14px;
+				color: var(--muted);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 12px;
+			}
+			.electronics-readout strong {
+				color: var(--text);
+				font-variant-numeric: tabular-nums;
+				font-weight: 600;
+				font-size: 15px;
+			}
+
 			details.advanced {
-				margin-top: 24px;
+				margin-top: 16px;
 				background: var(--surface);
 				border: 1px solid var(--border);
 				border-radius: var(--radius);
@@ -409,12 +451,13 @@
 			details.advanced summary::-webkit-details-marker {
 				display: none;
 			}
-			details.advanced summary::before {
-				content: "▸";
-				font-size: 10px;
+			details.advanced summary .chevron {
+				width: 16px;
+				height: 16px;
+				flex-shrink: 0;
 				transition: transform 0.15s;
 			}
-			details.advanced[open] summary::before {
+			details.advanced[open] summary .chevron {
 				transform: rotate(90deg);
 			}
 			details.advanced[open] summary {
@@ -793,18 +836,31 @@
 						</div>
 
 						<div class="target-row">
-							<label for="target-hz-input">Target outdoor pitch</label>
-							<input
-								type="number"
+							<label for="target-hz-input">Pit tuned to</label>
+							<select
 								id="target-hz-input"
 								x-model.number="targetHz"
-								min="430"
-								max="450"
-								inputmode="numeric"
-								step="1"
-								aria-describedby="target-hz-unit"
-							/>
-							<span id="target-hz-unit" class="unit-label">Hz</span>
+								class="pit-select"
+							>
+								<option :value="442">442 Hz</option>
+								<option :value="440">440 Hz</option>
+							</select>
+						</div>
+
+						<div class="target-row pit-row">
+							<label for="pit-reference-select">Match brass to</label>
+							<select
+								id="pit-reference-select"
+								x-model="pitReference"
+								class="pit-select"
+							>
+								<template x-for="pit in pitOptions" :key="pit.key">
+									<option
+										:value="pit.key"
+										x-text="pit.name + ' (' + pit.centsPerC.toFixed(2) + ' ¢/°C)'"
+									></option>
+								</template>
+							</select>
 						</div>
 					</div>
 
@@ -824,9 +880,27 @@
 							</div>
 						</template>
 					</div>
+					<div class="electronics-readout">
+						<span>Set electronics to</span>
+						<strong x-text="effectiveTargetHz.toFixed(1) + ' Hz'"></strong>
+					</div>
 
 					<details class="advanced">
-						<summary>Advanced: calibrate buffer factors</summary>
+						<summary>
+							<svg
+								class="chevron"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"
+							>
+								<path d="m9 18 6-6-6-6" />
+							</svg>
+							<span>Advanced: calibrate buffer factors</span>
+						</summary>
 						<div class="advanced-content">
 							<p>
 								Buffer factor (β) is the fraction of an instrument's air column
@@ -891,10 +965,15 @@
 						<div class="step-content">
 							<h3>Compute section targets</h3>
 							<p>
-								Plug conditions into the calculator. Use calibrated buffer
-								factors if you have them, defaults otherwise. The four section
-								targets typically spread across 1–3 Hz depending on the
-								indoor/outdoor delta.
+								Plug conditions into the calculator. Set
+								<strong>Pit tuned to</strong> the nominal pitch your pit gear was
+								tuned to at room temperature (440 or 442 Hz) and set
+								<strong>Match brass to</strong> the pit instrument you most want
+								the brass to lock with on the field (Average is a safe default if
+								you're unsure). Use calibrated buffer factors if you
+								have them, defaults otherwise. The four section targets
+								typically spread across 1–3 Hz depending on the indoor/outdoor
+								delta.
 							</p>
 						</div>
 					</div>
@@ -985,11 +1064,13 @@
 							>
 						</li>
 						<li>
-							<strong>Vibraphone bars drift opposite to brass.</strong>
+							<strong>Pit bars drift opposite to brass.</strong>
 							<span
-								>Aluminum bars drop slightly in heat while brass rises. Your
-								brass-vs-pit gap is wider than your brass-vs-brass spread in
-								extreme conditions.</span
+								>Wood/synthetic (marimba) and aluminum (vibes) both flatten
+								noticeably in heat, steel (glock) barely at all - while brass
+								rises. The <em>Match brass to</em> selector compensates for
+								this. Pick the instrument that carries the most exposed lines,
+								or leave it on Average.</span
 							>
 						</li>
 						<li>
@@ -1064,7 +1145,24 @@
 						<dt>shift</dt>
 						<dd>c_out_eff / c_in_eff - the ratio your pitch will drift by</dd>
 						<dt>targetHz</dt>
-						<dd>the frequency you want the section to land on outdoors</dd>
+						<dd>
+							the pit's nominal tuning pitch (e.g., 442 Hz at room temperature)
+						</dd>
+						<dt>k_pit</dt>
+						<dd>
+							pit bar drift coefficient (cents per °C); negative because bars
+							flatten in heat
+						</dd>
+						<dt>T_ref</dt>
+						<dd>
+							pit reference temperature (the room temp at which the bars were
+							tuned, ~20°C)
+						</dd>
+						<dt>effectiveTargetHz</dt>
+						<dd>
+							the pit's actual sounding pitch on the field - what the brass
+							should match instead of targetHz
+						</dd>
 						<dt>tuneTo</dt>
 						<dd>the indoor target each section actually tunes to</dd>
 					</dl>
@@ -1101,18 +1199,33 @@
 					</p>
 					<div class="formula">shift = c_out_eff / c_in_eff</div>
 					<p>
-						To land on the target frequency outdoors, tune indoors to a
-						deliberately offset frequency that will rise by exactly this factor
-						as the horn equilibrates:
+						The pit doesn't escape physics either. Bar instruments tuned at room
+						temperature drift flat on a hot field - wood/synthetic (marimba) and
+						aluminum (vibes) most, steel (glock) least. Since the brass needs to
+						lock with the pit, not the nominal pitch, the calculator first shifts
+						the target by the pit's expected drift:
 					</p>
-					<div class="formula">tuneTo = targetHz / shift</div>
+					<div class="formula">
+						effectiveTargetHz = targetHz · 2^(k_pit · (T_out − T_ref) / 1200)
+					</div>
+					<p>
+						k_pit is the bar drift coefficient (cents per °C, negative); T_ref
+						is the room temperature the bars were tuned at (20°C). The "Average"
+						option uses the mean coefficient across the three instruments.
+					</p>
+					<p>
+						To land on the pit's actual field pitch, tune indoors to a
+						deliberately offset frequency that will rise by exactly the brass
+						shift factor as the horn equilibrates:
+					</p>
+					<div class="formula">tuneTo = effectiveTargetHz / shift</div>
 					<p>
 						Each section gets its own tuneTo because each section has its own β.
 						Trumpets (short tubing, breath dominates the column) get a target
-						close to the bare targetHz. Tubas (long tubing, lots of cold metal)
-						get a target noticeably below it: they'll drift further sharp once
-						the air column equilibrates outdoors, so they start lower indoors
-						and land on pitch on the field.
+						close to the bare effectiveTargetHz. Tubas (long tubing, lots of
+						cold metal) get a target noticeably below it: they'll drift further
+						sharp once the air column equilibrates outdoors, so they start lower
+						indoors and land on the pit's pitch on the field.
 					</p>
 
 					<h2>What is the buffer factor?</h2>
@@ -1147,6 +1260,45 @@
 						describes how to refine them against your specific ensemble.
 					</p>
 
+					<h2>Why match the brass to a pit instrument?</h2>
+					<p>
+						Bar instruments in the pit are pitched by their physical bars, not
+						by an air column, so they don't shift the same way brass does. But
+						they do shift - bar stiffness drops slightly as temperature rises,
+						which flattens the pitch. The size of the effect depends on the
+						material, and (counterintuitively) is roughly comparable between
+						aluminum and wood, with steel notably smaller:
+					</p>
+					<ul style="padding-left: 20px; font-size: 14px">
+						<li style="margin-bottom: 6px">
+							<strong>Marimba</strong> (wood or synthetic) - largest measured
+							drift, around 0.39 cents flatter per °C above room temp
+						</li>
+						<li style="margin-bottom: 6px">
+							<strong>Vibes</strong> (aluminum) - close behind, around 0.29
+							cents/°C
+						</li>
+						<li style="margin-bottom: 6px">
+							<strong>Glock</strong> (steel) - barely moves, around 0.05
+							cents/°C, but lives high enough that even small errors are exposed
+						</li>
+					</ul>
+					<p>
+						The pit can't be retuned on the field, so the brass has to come to
+						them. Pick the instrument that carries the most exposed melodic or
+						sustained material in your book - vibes is the usual choice because
+						its sustain makes it the most audible reference, even though marimba
+						technically drifts more. If you're not sure, Average splits the
+						difference.
+					</p>
+					<p>
+						These coefficients come from measured frequencies of front ensemble
+						instruments at indoor (~72°F) and outdoor (~85°F) temperatures. Real
+						bars still vary by manufacturer, age, and tuning process; refine
+						against observation if your pit consistently sits off from where the
+						calculator predicts.
+					</p>
+
 					<h2>Calibrating buffer factors for your corps</h2>
 					<p>The defaults are starting points. To dial in your real numbers:</p>
 					<ol style="padding-left: 20px">
@@ -1178,8 +1330,8 @@
 
 			<footer>
 				<p>
-					Buffer factor calibrations save automatically. Built for drum corps
-					brass intonation.
+					Your settings save automatically. Built for drum corps brass
+					intonation.
 				</p>
 			</footer>
 		</div>
@@ -1195,11 +1347,29 @@
 					outdoorT: 88,
 					outdoorRH: 60,
 					targetHz: 442,
+					pitReference: "average",
 					buffers: {
 						trumpet: 0.7,
 						mellophone: 0.75,
 						baritone: 0.8,
 						tuba: 0.9,
+					},
+
+					pitInstruments: [
+						{ key: "vibes", name: "Vibes", centsPerC: -0.29 },
+						{ key: "marimba", name: "Marimba", centsPerC: -0.39 },
+						{ key: "glock", name: "Glock", centsPerC: -0.05 },
+					],
+					pitReferenceTempC: 20,
+
+					get pitOptions() {
+						const avg =
+							this.pitInstruments.reduce((s, p) => s + p.centsPerC, 0) /
+							this.pitInstruments.length;
+						return [
+							{ key: "average", name: "Average", centsPerC: avg },
+							...this.pitInstruments,
+						];
 					},
 
 					get tempMin() {
@@ -1256,12 +1426,21 @@
 						);
 					},
 
+					get effectiveTargetHz() {
+						const pit = this.pitOptions.find(p => p.key === this.pitReference);
+						if (!pit) return this.targetHz;
+						const deltaC =
+							this.toCelsius(this.outdoorT) - this.pitReferenceTempC;
+						const pitShiftCents = pit.centsPerC * deltaC;
+						return this.targetHz * Math.pow(2, pitShiftCents / 1200);
+					},
+
 					sectionResult(buffer) {
 						const cInEff = (1 - buffer) * this.cBreath + buffer * this.cIndoor;
 						const cOutEff =
 							(1 - buffer) * this.cBreath + buffer * this.cOutdoor;
 						const adjRatio = cOutEff / cInEff;
-						const tuneTo = this.targetHz / adjRatio;
+						const tuneTo = this.effectiveTargetHz / adjRatio;
 						const cents = 1200 * Math.log2(tuneTo / this.targetHz);
 						return { tuneTo, cents };
 					},
@@ -1300,6 +1479,7 @@
 									units: this.units,
 									theme: this.theme,
 									targetHz: this.targetHz,
+									pitReference: this.pitReference,
 									buffers: this.buffers,
 								}),
 							);
@@ -1316,7 +1496,9 @@
 							if (!raw) return;
 							const data = JSON.parse(raw);
 							if (data.units) this.units = data.units;
-							if (data.targetHz) this.targetHz = data.targetHz;
+							if (data.targetHz === 440 || data.targetHz === 442)
+								this.targetHz = data.targetHz;
+							if (data.pitReference) this.pitReference = data.pitReference;
 							if (data.buffers) Object.assign(this.buffers, data.buffers);
 						} catch (e) {}
 					},
@@ -1334,6 +1516,7 @@
 							this.applyTheme();
 						});
 						this.$watch("targetHz", () => this.saveState());
+						this.$watch("pitReference", () => this.saveState());
 						this.$watch("buffers", () => this.saveState(), { deep: true });
 					},
 				};
