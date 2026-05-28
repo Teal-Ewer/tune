@@ -832,9 +832,8 @@
 				</div>
 				<h1>Brass tuning calculator</h1>
 				<p class="subtitle">
-					Section-specific tuning targets for drum corps, compensating for
-					temperature and humidity between indoor tuning and outdoor
-					performance.
+					Section-specific tuning targets for drum corps, compensating for the
+					temperature difference between indoor tuning and outdoor performance.
 				</p>
 				<nav>
 					<button
@@ -893,27 +892,6 @@
 										x-text="'°' + units"
 									></span>
 								</div>
-								<div class="input-row">
-									<label id="indoor-humidity-label" for="indoor-humidity-slider"
-										>Humidity</label
-									>
-									<input
-										type="range"
-										id="indoor-humidity-slider"
-										x-model.number="indoorRH"
-										min="0"
-										max="100"
-										aria-labelledby="indoor-humidity-label"
-										aria-describedby="indoor-humidity-unit"
-									/>
-									<output
-										class="value-display"
-										for="indoor-humidity-slider"
-										x-text="indoorRH"
-										aria-describedby="indoor-humidity-unit"
-									></output>
-									<span id="indoor-humidity-unit" class="unit-label">%</span>
-								</div>
 							</div>
 
 							<div class="condition-group">
@@ -942,29 +920,6 @@
 										class="unit-label"
 										x-text="'°' + units"
 									></span>
-								</div>
-								<div class="input-row">
-									<label
-										id="outdoor-humidity-label"
-										for="outdoor-humidity-slider"
-										>Humidity</label
-									>
-									<input
-										type="range"
-										id="outdoor-humidity-slider"
-										x-model.number="outdoorRH"
-										min="0"
-										max="100"
-										aria-labelledby="outdoor-humidity-label"
-										aria-describedby="outdoor-humidity-unit"
-									/>
-									<output
-										class="value-display"
-										for="outdoor-humidity-slider"
-										x-text="outdoorRH"
-										aria-describedby="outdoor-humidity-unit"
-									></output>
-									<span id="outdoor-humidity-unit" class="unit-label">%</span>
 								</div>
 							</div>
 						</div>
@@ -1121,10 +1076,10 @@
 						<div class="step-content">
 							<h3>Measure conditions</h3>
 							<p>
-								Temperature and humidity, both at the tuning area and at the
-								actual performance field. Handheld instruments are far more
-								reliable than weather apps for spot conditions. Measure close to
-								tuning time if conditions are shifting.
+								Temperature, both at the tuning area and at the actual
+								performance field. Handheld thermometers are far more reliable
+								than weather apps for spot conditions. Measure close to tuning
+								time if conditions are shifting.
 							</p>
 						</div>
 					</div>
@@ -1135,14 +1090,13 @@
 							<h3>Compute section targets</h3>
 							<p>
 								Plug conditions into the calculator. Set
-								<strong>Pit tuned to</strong> the nominal pitch your pit gear was
-								tuned to at room temperature (440 or 442 Hz) and set
+								<strong>Pit tuned to</strong> the nominal pitch your pit gear
+								was tuned to at room temperature (440 or 442 Hz) and set
 								<strong>Match brass to</strong> the pit instrument you most want
-								the brass to lock with on the field (Average is a safe default if
-								you're unsure). Use calibrated buffer factors if you
-								have them, defaults otherwise. The four section targets
-								typically spread across 1–3 Hz depending on the indoor/outdoor
-								delta.
+								the brass to lock with on the field (Average is a safe default
+								if you're unsure). Use calibrated buffer factors if you have
+								them, defaults otherwise. The four section targets typically
+								spread across 1–3 Hz depending on the indoor/outdoor delta.
 							</p>
 						</div>
 					</div>
@@ -1292,15 +1246,13 @@
 						<dd>speed of sound in the air (m/s)</dd>
 						<dt>T</dt>
 						<dd>temperature (°C)</dd>
-						<dt>RH</dt>
-						<dd>relative humidity (%)</dd>
 						<dt>β</dt>
 						<dd>
 							buffer factor - fraction of the air column that tracks ambient
 							temperature; (1 − β) is the fraction held near breath temperature
 						</dd>
 						<dt>c_breath</dt>
-						<dd>speed of sound at breath temperature (~35°C, saturated)</dd>
+						<dd>speed of sound at breath temperature (~35°C)</dd>
 						<dt>c_ambient</dt>
 						<dd>speed of sound at the surrounding air (indoor or outdoor)</dd>
 						<dt>c_eff</dt>
@@ -1335,17 +1287,24 @@
 						<dt>tuneTo</dt>
 						<dd>the indoor target each section actually tunes to</dd>
 					</dl>
-					<p>
-						Speed of sound depends mostly on temperature, slightly on humidity:
-					</p>
+					<p>Speed of sound depends almost entirely on temperature:</p>
 					<div class="formula">
-						c(T, RH) ≈ 331.3 + 0.606·T + 0.0124·RH&nbsp;&nbsp;&nbsp;(m/s, T in
-						°C, RH in %)
+						c(T) ≈ 331.3 + 0.606·T&nbsp;&nbsp;&nbsp;(m/s, T in °C)
 					</div>
 					<p>
 						A 10°C warming raises c by about 1.8%. Because f scales with c, that
 						same horn now plays 1.8% sharp - roughly 30 cents. Easily audible,
 						and the entire problem this calculator pre-compensates for.
+					</p>
+					<p>
+						Humidity and altitude are deliberately left out. Humidity nudges the
+						speed of sound by only a fraction of a percent, and since the
+						calculator works from the <em>difference</em> between indoor and
+						outdoor, even that mostly cancels - the net effect on a target is
+						well under a cent. Altitude has no direct effect at all: the speed
+						of sound depends on the ratio of air pressure to density, which
+						stays constant as you climb. Elevation changes pitch only insofar as
+						it changes temperature, which you are already measuring.
 					</p>
 					<p>
 						But the air inside a horn is not all at ambient temperature. Warm
@@ -1371,8 +1330,8 @@
 						The pit doesn't escape physics either. Bar instruments tuned at room
 						temperature drift flat on a hot field - wood/synthetic (marimba) and
 						aluminum (vibes) most, steel (glock) least. Since the brass needs to
-						lock with the pit, not the nominal pitch, the calculator first shifts
-						the target by the pit's expected drift:
+						lock with the pit, not the nominal pitch, the calculator first
+						shifts the target by the pit's expected drift:
 					</p>
 					<div class="formula">
 						effectiveTargetHz = targetHz · 2^(k_pit · (T_out − T_ref) / 1200)
@@ -1519,8 +1478,10 @@
 					>
 						<div class="dialog-header">
 							<h2 id="math-dialog-title">
-								<span x-text="mathSection.name"></span> —
-								<span x-text="Math.round(mathSection.result.tuneTo) + ' Hz'"></span>
+								<span x-text="mathSection.name"></span> -
+								<span
+									x-text="Math.round(mathSection.result.tuneTo) + ' Hz'"
+								></span>
 							</h2>
 							<button
 								class="dialog-close"
@@ -1544,10 +1505,10 @@
 										x-text="`room ${tempLabel(indoorT)}, field ${tempLabel(outdoorT)}`"
 									></div>
 									<div
-										x-text="`c_in  = 331.3 + 0.606·${toCelsius(indoorT).toFixed(1)} + 0.0124·${indoorRH} = ${mathSection.result.cIndoor.toFixed(1)}`"
+										x-text="`c_in  = 331.3 + 0.606·${toCelsius(indoorT).toFixed(1)} = ${mathSection.result.cIndoor.toFixed(1)}`"
 									></div>
 									<div
-										x-text="`c_out = 331.3 + 0.606·${toCelsius(outdoorT).toFixed(1)} + 0.0124·${outdoorRH} = ${mathSection.result.cOutdoor.toFixed(1)}`"
+										x-text="`c_out = 331.3 + 0.606·${toCelsius(outdoorT).toFixed(1)} = ${mathSection.result.cOutdoor.toFixed(1)}`"
 									></div>
 								</div>
 							</div>
@@ -1598,9 +1559,7 @@
 					units: "F",
 					theme: "light",
 					indoorT: 68,
-					indoorRH: 45,
 					outdoorT: 88,
-					outdoorRH: 60,
 					targetHz: 442,
 					pitReference: "average",
 					mathSectionKey: null,
@@ -1654,26 +1613,20 @@
 						return this.units === "F" ? ((t - 32) * 5) / 9 : t;
 					},
 
-					speedOfSound(tC, rh) {
-						return 331.3 + 0.606 * tC + 0.0124 * rh;
+					speedOfSound(tC) {
+						return 331.3 + 0.606 * tC;
 					},
 
 					get cBreath() {
-						return this.speedOfSound(35, 100);
+						return this.speedOfSound(35);
 					},
 
 					get cIndoor() {
-						return this.speedOfSound(
-							this.toCelsius(this.indoorT),
-							this.indoorRH,
-						);
+						return this.speedOfSound(this.toCelsius(this.indoorT));
 					},
 
 					get cOutdoor() {
-						return this.speedOfSound(
-							this.toCelsius(this.outdoorT),
-							this.outdoorRH,
-						);
+						return this.speedOfSound(this.toCelsius(this.outdoorT));
 					},
 
 					get effectiveTargetHz() {
@@ -1802,7 +1755,7 @@
 						this.$watch("targetHz", () => this.saveState());
 						this.$watch("pitReference", () => this.saveState());
 						this.$watch("buffers", () => this.saveState(), { deep: true });
-						this.$watch("mathSectionKey", (key) => {
+						this.$watch("mathSectionKey", key => {
 							document.body.style.overflow = key ? "hidden" : "";
 						});
 					},
