@@ -384,10 +384,28 @@
 				border: 1px solid var(--border);
 				border-radius: var(--radius);
 				padding: 16px;
-				transition: border-color 0.15s;
+				cursor: pointer;
+				transition:
+					border-color 0.15s,
+					box-shadow 0.15s;
 			}
 			.target-card:hover {
 				border-color: var(--border-strong);
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+			}
+			.target-card:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+			}
+			.target-hint {
+				margin-top: 10px;
+				font-size: 11px;
+				font-weight: 500;
+				color: var(--accent);
+			}
+			.target-hint::before {
+				content: "▸ ";
+				font-size: 9px;
 			}
 
 			.target-section-name {
@@ -418,6 +436,8 @@
 				border-radius: var(--radius);
 				font-size: 14px;
 				color: var(--muted);
+			}
+			.electronics-main {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
@@ -428,6 +448,120 @@
 				font-variant-numeric: tabular-nums;
 				font-weight: 600;
 				font-size: 15px;
+			}
+
+			details.math {
+				margin-top: 12px;
+				padding-top: 10px;
+				border-top: 1px solid var(--border);
+			}
+			details.math summary {
+				cursor: pointer;
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--accent);
+				list-style: none;
+			}
+			details.math summary::-webkit-details-marker {
+				display: none;
+			}
+			details.math summary::before {
+				content: "▸";
+				display: inline-block;
+				margin-right: 6px;
+				font-size: 10px;
+				transition: transform 0.15s;
+			}
+			details.math[open] summary::before {
+				transform: rotate(90deg);
+			}
+			.math-body {
+				margin-top: 10px;
+			}
+			.math-step {
+				margin-bottom: 12px;
+			}
+			.math-step:last-child {
+				margin-bottom: 0;
+			}
+			.math-label {
+				margin: 0 0 4px;
+				font-size: 12px;
+				color: var(--muted);
+			}
+			.math-calc {
+				padding: 8px 10px;
+				background: var(--surface-2);
+				border-radius: var(--radius-sm);
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-size: 11px;
+				line-height: 1.5;
+				color: var(--text);
+				overflow-x: auto;
+			}
+			.math-calc div {
+				white-space: pre;
+			}
+
+			.dialog-backdrop {
+				position: fixed;
+				inset: 0;
+				z-index: 50;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 20px;
+				background: rgba(0, 0, 0, 0.5);
+			}
+			.dialog {
+				width: 100%;
+				max-width: 460px;
+				max-height: 85vh;
+				overflow-y: auto;
+				padding: 20px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+			}
+			.dialog-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin-bottom: 16px;
+			}
+			.dialog-header h2 {
+				margin: 0;
+				font-size: 16px;
+				font-weight: 600;
+			}
+			.dialog-close {
+				flex-shrink: 0;
+				width: 28px;
+				height: 28px;
+				padding: 0;
+				font-size: 20px;
+				line-height: 1;
+				background: none;
+				border: none;
+				border-radius: var(--radius-sm);
+				color: var(--muted);
+				cursor: pointer;
+				font-family: inherit;
+			}
+			.dialog-close:hover {
+				background: var(--surface-2);
+				color: var(--text);
+			}
+			.dialog-intro {
+				margin: 0 0 16px;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.dialog-intro strong {
+				color: var(--text);
+				font-variant-numeric: tabular-nums;
 			}
 
 			details.advanced {
@@ -867,22 +1001,57 @@
 					<h2 class="section-heading">Tune each section to</h2>
 					<div class="targets-grid">
 						<template x-for="section in sections" :key="section.key">
-							<div class="target-card">
+							<div
+								class="target-card"
+								role="button"
+								tabindex="0"
+								:aria-label="'Show the math for ' + section.name"
+								@click="mathSectionKey = section.key"
+								@keydown.enter="mathSectionKey = section.key"
+								@keydown.space.prevent="mathSectionKey = section.key"
+							>
 								<div class="target-section-name" x-text="section.name"></div>
 								<div
 									class="target-hz"
-									x-text="Math.round(sectionResult(section.buffer).tuneTo) + ' Hz'"
+									x-text="Math.round(section.result.tuneTo) + ' Hz'"
 								></div>
 								<div
 									class="target-cents"
-									x-text="formatCents(sectionResult(section.buffer).cents) + ' from A=' + targetHz"
+									x-text="formatCents(section.result.cents) + ' from A=' + targetHz"
 								></div>
+								<div class="target-hint">Show the math</div>
 							</div>
 						</template>
 					</div>
 					<div class="electronics-readout">
-						<span>Set electronics to</span>
-						<strong x-text="effectiveTargetHz.toFixed(1) + ' Hz'"></strong>
+						<div class="electronics-main">
+							<span>Set electronics to</span>
+							<strong x-text="effectiveTargetHz.toFixed(1) + ' Hz'"></strong>
+						</div>
+						<details class="math">
+							<summary>Show the math</summary>
+							<div class="math-body">
+								<div class="math-step">
+									<p class="math-label">1. Pit bars flatten as they warm.</p>
+									<div class="math-calc">
+										<div
+											x-text="`${pitShiftDetail.name}: k = ${pitShiftDetail.k.toFixed(2)} ¢/°C`"
+										></div>
+										<div
+											x-text="`ΔT = ${toCelsius(outdoorT).toFixed(1)} − ${pitReferenceTempC} = ${pitShiftDetail.deltaC.toFixed(1)} °C`"
+										></div>
+									</div>
+								</div>
+								<div class="math-step">
+									<p class="math-label">2. Pit's actual pitch on the field.</p>
+									<div class="math-calc">
+										<div
+											x-text="`${targetHz} · 2^(${pitShiftDetail.k.toFixed(2)}·${pitShiftDetail.deltaC.toFixed(1)} / 1200) = ${pitShiftDetail.result.toFixed(1)} Hz`"
+										></div>
+									</div>
+								</div>
+							</div>
+						</details>
 					</div>
 
 					<details class="advanced">
@@ -1334,6 +1503,92 @@
 					intonation.
 				</p>
 			</footer>
+
+			<template x-if="mathSection">
+				<div
+					class="dialog-backdrop"
+					@click="mathSectionKey = null"
+					@keydown.escape.window="mathSectionKey = null"
+				>
+					<div
+						class="dialog"
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby="math-dialog-title"
+						@click.stop
+					>
+						<div class="dialog-header">
+							<h2 id="math-dialog-title">
+								<span x-text="mathSection.name"></span> —
+								<span x-text="Math.round(mathSection.result.tuneTo) + ' Hz'"></span>
+							</h2>
+							<button
+								class="dialog-close"
+								aria-label="Close"
+								@click="mathSectionKey = null"
+							>
+								×
+							</button>
+						</div>
+						<div class="math-body">
+							<p class="dialog-intro">
+								Pit's pitch on the field is
+								<strong x-text="effectiveTargetHz.toFixed(1) + ' Hz'"></strong>
+								(see "Set electronics to" for that step). Here's how
+								<span x-text="mathSection.name"></span> gets there:
+							</p>
+							<div class="math-step">
+								<p class="math-label">1. Speed of sound rises with heat.</p>
+								<div class="math-calc">
+									<div
+										x-text="`room ${tempLabel(indoorT)}, field ${tempLabel(outdoorT)}`"
+									></div>
+									<div
+										x-text="`c_in  = 331.3 + 0.606·${toCelsius(indoorT).toFixed(1)} + 0.0124·${indoorRH} = ${mathSection.result.cIndoor.toFixed(1)}`"
+									></div>
+									<div
+										x-text="`c_out = 331.3 + 0.606·${toCelsius(outdoorT).toFixed(1)} + 0.0124·${outdoorRH} = ${mathSection.result.cOutdoor.toFixed(1)}`"
+									></div>
+								</div>
+							</div>
+							<div class="math-step">
+								<p class="math-label">
+									2. Breath warms part of the column (β tracks ambient).
+								</p>
+								<div class="math-calc">
+									<div
+										x-text="`β = ${mathSection.buffer.toFixed(2)}, breath air = ${mathSection.result.cBreath.toFixed(1)}`"
+									></div>
+									<div
+										x-text="`c_in_eff  = ${(1 - mathSection.buffer).toFixed(2)}·${mathSection.result.cBreath.toFixed(1)} + ${mathSection.buffer.toFixed(2)}·${mathSection.result.cIndoor.toFixed(1)} = ${mathSection.result.cInEff.toFixed(1)}`"
+									></div>
+									<div
+										x-text="`c_out_eff = ${(1 - mathSection.buffer).toFixed(2)}·${mathSection.result.cBreath.toFixed(1)} + ${mathSection.buffer.toFixed(2)}·${mathSection.result.cOutdoor.toFixed(1)} = ${mathSection.result.cOutEff.toFixed(1)}`"
+									></div>
+								</div>
+							</div>
+							<div class="math-step">
+								<p class="math-label">3. Pitch drifts by the ratio.</p>
+								<div class="math-calc">
+									<div
+										x-text="`shift = ${mathSection.result.cOutEff.toFixed(1)} / ${mathSection.result.cInEff.toFixed(1)} = ${mathSection.result.shift.toFixed(4)}`"
+									></div>
+								</div>
+							</div>
+							<div class="math-step">
+								<p class="math-label">
+									4. Tune indoors below target so it rises onto pitch.
+								</p>
+								<div class="math-calc">
+									<div
+										x-text="`tuneTo = ${effectiveTargetHz.toFixed(1)} / ${mathSection.result.shift.toFixed(4)} = ${mathSection.result.tuneTo.toFixed(1)} → ${Math.round(mathSection.result.tuneTo)} Hz`"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
 		</div>
 
 		<script>
@@ -1348,6 +1603,7 @@
 					outdoorRH: 60,
 					targetHz: 442,
 					pitReference: "average",
+					mathSectionKey: null,
 					buffers: {
 						trumpet: 0.7,
 						mellophone: 0.75,
@@ -1380,23 +1636,17 @@
 					},
 
 					get sections() {
+						const make = (key, name, buffer) => ({
+							key,
+							name,
+							buffer,
+							result: this.sectionResult(buffer),
+						});
 						return [
-							{
-								key: "trumpet",
-								name: "Trumpets",
-								buffer: this.buffers.trumpet,
-							},
-							{
-								key: "mellophone",
-								name: "Mellophones",
-								buffer: this.buffers.mellophone,
-							},
-							{
-								key: "baritone",
-								name: "Baritones",
-								buffer: this.buffers.baritone,
-							},
-							{ key: "tuba", name: "Tubas/Contras", buffer: this.buffers.tuba },
+							make("trumpet", "Trumpets", this.buffers.trumpet),
+							make("mellophone", "Mellophones", this.buffers.mellophone),
+							make("baritone", "Baritones", this.buffers.baritone),
+							make("tuba", "Tubas/Contras", this.buffers.tuba),
 						];
 					},
 
@@ -1435,6 +1685,24 @@
 						return this.targetHz * Math.pow(2, pitShiftCents / 1200);
 					},
 
+					get pitShiftDetail() {
+						const pit = this.pitOptions.find(p => p.key === this.pitReference);
+						const deltaC =
+							this.toCelsius(this.outdoorT) - this.pitReferenceTempC;
+						return {
+							name: pit ? pit.name : "",
+							k: pit ? pit.centsPerC : 0,
+							deltaC,
+							result: this.effectiveTargetHz,
+						};
+					},
+
+					get mathSection() {
+						return (
+							this.sections.find(s => s.key === this.mathSectionKey) || null
+						);
+					},
+
 					sectionResult(buffer) {
 						const cInEff = (1 - buffer) * this.cBreath + buffer * this.cIndoor;
 						const cOutEff =
@@ -1442,7 +1710,23 @@
 						const adjRatio = cOutEff / cInEff;
 						const tuneTo = this.effectiveTargetHz / adjRatio;
 						const cents = 1200 * Math.log2(tuneTo / this.targetHz);
-						return { tuneTo, cents };
+						return {
+							cBreath: this.cBreath,
+							cIndoor: this.cIndoor,
+							cOutdoor: this.cOutdoor,
+							cInEff,
+							cOutEff,
+							shift: adjRatio,
+							tuneTo,
+							cents,
+						};
+					},
+
+					tempLabel(t) {
+						const c = this.toCelsius(t);
+						return this.units === "F"
+							? c.toFixed(1) + "°C (" + t + "°F)"
+							: c.toFixed(1) + "°C";
 					},
 
 					formatCents(c) {
