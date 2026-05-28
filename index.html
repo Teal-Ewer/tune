@@ -1802,6 +1802,9 @@
 						this.$watch("targetHz", () => this.saveState());
 						this.$watch("pitReference", () => this.saveState());
 						this.$watch("buffers", () => this.saveState(), { deep: true });
+						this.$watch("mathSectionKey", (key) => {
+							document.body.style.overflow = key ? "hidden" : "";
+						});
 					},
 				};
 			}
